@@ -4,7 +4,8 @@
 #include <QPainter>
 #include <QTimer>
 #include <QPropertyAnimation>
-
+#include <QEvent>
+#include <QMoveEvent>
 MsgBoxManager::MsgBoxManager(QWidget *parent)
     : QWidget{parent}
 {
@@ -13,6 +14,8 @@ MsgBoxManager::MsgBoxManager(QWidget *parent)
 
     m_suitable_width = qMin(300, parentWidget()->width());
     setFixedWidth(m_suitable_width);
+
+    parent->installEventFilter(this);
 }
 
 MsgBoxCard* MsgBoxManager::createMsgBoxCard(MsgBoxInfo* info)
@@ -22,6 +25,32 @@ MsgBoxCard* MsgBoxManager::createMsgBoxCard(MsgBoxInfo* info)
 
     addMsgBox(card);
     return card;
+}
+
+bool MsgBoxManager::eventFilter(QObject *target, QEvent *event)
+{
+    if (target == parentWidget())
+    {
+        switch (event->type())
+        {
+        case QEvent::Resize:
+            break;
+        case QEvent::Move:
+        {
+            QMoveEvent* moveEvent = static_cast<QMoveEvent*>(event);
+            int diffx = moveEvent->pos().x() - moveEvent->oldPos().x();
+            int diffy = moveEvent->pos().y() - moveEvent->oldPos().y();
+            setGeometry(pos().x()+diffx, pos().y()+diffy, width(), height());
+        }
+        break;
+        case QEvent::Close:
+            close();
+            break;
+        default:
+            break;
+        }
+    }
+    return QWidget::eventFilter(target, event);
 }
 
 void MsgBoxManager::slotCardClosed(MsgBoxCard *card)
@@ -107,14 +136,16 @@ MsgBoxCard::MsgBoxCard(MsgBoxInfo* info, QWidget *parent): QWidget(parent)
         m_icon->setStyleSheet("background-image:url(:/resource/error.png)");
     else if(info->m_MsgType == MsgBoxInfo::warn)
         m_icon->setStyleSheet("background-image:url(:/resource/warn.png)");
+    else if(info->m_MsgType == MsgBoxInfo::success)
+        m_icon->setStyleSheet("background-image:url(:/resource/success.png)");
     else
-        m_icon->setStyleSheet("background-image:url(:/resource/info.png)");
+         m_icon->setStyleSheet("background-image:url(:/resource/info.png)");
 
     m_icon->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     m_content_label  = new QLabel(info->m_Msg, this);
     m_content_label->setAlignment(Qt::AlignTop);
-    m_content_label->setStyleSheet("font-family:\"微软雅黑\"; font-size:11px;");
+    m_content_label->setStyleSheet("font-family:\"微软雅黑\"; font-size:12px;");
 
     QHBoxLayout* hlayout = new QHBoxLayout(this);
     hlayout->setContentsMargins(0,0,0,0);
@@ -136,7 +167,7 @@ MsgBoxCard::MsgBoxCard(MsgBoxInfo* info, QWidget *parent): QWidget(parent)
     m_content_label->setWordWrap(true);
 
     // 控件大小
-    resize(m_content_label->width()+m_icon->width()+2+20, m_content_label->height()+10);
+    resize(m_content_label->width()+m_icon->width()+2+20, m_content_label->height()+20);
 
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);

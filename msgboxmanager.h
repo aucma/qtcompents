@@ -8,10 +8,11 @@ class MsgBoxInfo : public QObject
 {
     Q_OBJECT
 public:
-    enum MsgType{
+    enum MsgType {
         error,
         warn,
-        info
+        info,
+        success
     };
 
     MsgBoxInfo(QString content, MsgType type, QObject* parent= nullptr): QObject(parent)
@@ -58,8 +59,37 @@ class MsgBoxManager : public QWidget
     Q_OBJECT
 public:
     explicit MsgBoxManager(QWidget *parent = nullptr);
+    ~MsgBoxManager()
+    {
+
+    }
     MsgBoxCard* createMsgBoxCard(MsgBoxInfo* info);
 
+    void showError(QString content)
+    {
+        MsgBoxInfo* info = new MsgBoxInfo(content, MsgBoxInfo::error);
+        createMsgBoxCard(info);
+    }
+
+    void showInfo(QString content)
+    {
+        MsgBoxInfo* info = new MsgBoxInfo(content, MsgBoxInfo::info);
+        createMsgBoxCard(info);
+    }
+
+    void showWarn(QString content)
+    {
+        MsgBoxInfo* info = new MsgBoxInfo(content, MsgBoxInfo::warn);
+        createMsgBoxCard(info);
+    }
+
+    void showSuccess(QString content)
+    {
+        MsgBoxInfo* info = new MsgBoxInfo(content, MsgBoxInfo::success);
+        createMsgBoxCard(info);
+    }
+
+    bool eventFilter(QObject *target, QEvent *event) override;
 signals:
 
 public slots:

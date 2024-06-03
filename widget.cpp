@@ -18,27 +18,24 @@ Widget::~Widget()
 
 void Widget::on_pushButton_clicked()
 {
-    static int i = 0;
-
-    MsgBoxInfo* info = new MsgBoxInfo(QString("码错误用户名密码错误用户名码错误用户误 %1").arg(i++), (MsgBoxInfo::MsgType)(i % 3), this);
-    m_msgboxmanager->createMsgBoxCard(info);
+    m_msgboxmanager->showInfo("提示信息");
 }
 
 
 void Widget::on_pushButton_2_clicked()
 {
-    static int i = 0;
-
-    MsgBoxInfo* info = new MsgBoxInfo(QString("码错误码错误用户名密码错误用户名码错误用户码错误码错误用户名密码错误用户名码错误用户误用户名密码错误用户名码错误用户误误用户名密码错误用户名码错误用户误 %1").arg(i++), (MsgBoxInfo::MsgType)(i % 3), this);
-    m_msgboxmanager->createMsgBoxCard(info);
+    m_msgboxmanager->showError("错误信息");
 }
 
 
 void Widget::on_pushButton_3_clicked()
 {
-    static int i = 0;
+    m_msgboxmanager->showSuccess("成功信息");
+}
 
-    MsgBoxInfo* info = new MsgBoxInfo(QString("%1").arg(i++), (MsgBoxInfo::MsgType)(i % 3), this);
-    m_msgboxmanager->createMsgBoxCard(info);
+
+void Widget::on_pushButton_4_clicked()
+{
+    m_msgboxmanager->showWarn("警告信息");
 }
 
